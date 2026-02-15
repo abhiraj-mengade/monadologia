@@ -93,15 +93,15 @@ export function BuildingView({ apiUrl, mathMode }: BuildingViewProps) {
     const fetchBuilding = async () => {
       try {
         const res = await fetch(`${apiUrl}/building`);
+        if (!res.ok) throw new Error('Failed to fetch');
         const data = await res.json();
         setBuilding(data);
         setLoading(false);
         setIsOffline(false);
-      } catch {
-        if (!building) {
-          setBuilding(DEMO_BUILDING);
-          setIsOffline(true);
-        }
+      } catch (err) {
+        console.error('Failed to fetch building:', err);
+        setBuilding(prev => prev || DEMO_BUILDING);
+        setIsOffline(true);
         setLoading(false);
       }
     };
