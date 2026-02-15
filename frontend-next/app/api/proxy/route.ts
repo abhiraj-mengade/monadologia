@@ -2,51 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://80.225.209.87:3335';
 
-export async function GET(
-  request: NextRequest,
-  context: { params: Promise<{ path: string[] }> }
-) {
-  const params = await context.params;
-  return proxyRequest(request, params.path, 'GET');
-}
-
-export async function POST(
-  request: NextRequest,
-  context: { params: Promise<{ path: string[] }> }
-) {
-  const params = await context.params;
-  return proxyRequest(request, params.path, 'POST');
-}
-
-export async function PUT(
-  request: NextRequest,
-  context: { params: Promise<{ path: string[] }> }
-) {
-  const params = await context.params;
-  return proxyRequest(request, params.path, 'PUT');
-}
-
-export async function DELETE(
-  request: NextRequest,
-  context: { params: Promise<{ path: string[] }> }
-) {
-  const params = await context.params;
-  return proxyRequest(request, params.path, 'DELETE');
-}
-
-async function proxyRequest(
-  request: NextRequest,
-  path: string[],
-  method: string
-) {
+async function proxyRequest(request: NextRequest, path: string, method: string) {
   try {
-    // Join path segments
-    const pathStr = path.join('/');
     const url = new URL(request.url);
     const queryString = url.search;
     
-    // Construct backend URL
-    const backendUrl = `${BACKEND_URL}/${pathStr}${queryString}`;
+    const backendUrl = path 
+      ? `${BACKEND_URL}/${path}${queryString}`
+      : `${BACKEND_URL}${queryString}`;
     
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
@@ -91,6 +54,22 @@ async function proxyRequest(
       { status: 500 }
     );
   }
+}
+
+export async function GET(request: NextRequest) {
+  return proxyRequest(request, '', 'GET');
+}
+
+export async function POST(request: NextRequest) {
+  return proxyRequest(request, '', 'POST');
+}
+
+export async function PUT(request: NextRequest) {
+  return proxyRequest(request, '', 'PUT');
+}
+
+export async function DELETE(request: NextRequest) {
+  return proxyRequest(request, '', 'DELETE');
 }
 
 export async function OPTIONS() {
