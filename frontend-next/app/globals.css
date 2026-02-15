@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;700&family=Dancing+Script:wght@400;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-monad-deep text-monad-cream font-mono;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Baroque-Cyberpunk Glow Effects */
+.monad-glow {
+  box-shadow: 0 0 20px rgba(61, 217, 196, 0.3);
+  border: 1px solid #4a1528;
+}
+
+.monad-glow-gold {
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+}
+
+/* Glitch Animation for Chaos Agents */
+@keyframes glitch {
+  0% { transform: translate(0) }
+  20% { transform: translate(-2px, 2px) }
+  40% { transform: translate(-2px, -2px) }
+  60% { transform: translate(2px, 2px) }
+  80% { transform: translate(2px, -2px) }
+  100% { transform: translate(0) }
+}
+
+.agent-chaos {
+  animation: glitch 0.3s infinite;
+  color: #e8736a;
+}
+
+/* Parchment Terminal Effect */
+.parchment-terminal {
+  background: linear-gradient(180deg, rgba(250, 243, 224, 0.05) 0%, rgba(250, 243, 224, 0.02) 100%);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+/* Building Grid Cell */
+.building-cell {
+  @apply border border-monad-burgundy/40 p-2 text-xs relative overflow-hidden;
+  transition: all 0.3s ease;
+  min-height: 60px;
+}
+
+.building-cell:hover {
+  @apply border-monad-teal/60;
+  box-shadow: 0 0 10px rgba(61, 217, 196, 0.2);
+}
+
+/* Vibe Colors */
+.vibe-drama {
+  background: radial-gradient(circle, rgba(232, 115, 106, 0.2) 0%, transparent 70%);
+}
+
+.vibe-chill {
+  background: radial-gradient(circle, rgba(61, 217, 196, 0.2) 0%, transparent 70%);
+}
+
+.vibe-party {
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.3) 0%, transparent 70%);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 10, 46, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(61, 217, 196, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(61, 217, 196, 0.5);
+}
+
+/* Pulse Animation for Live Indicator */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Background Drift Animation */
+@keyframes bg-drift {
+  0%, 100% { 
+    background-position: center center;
+    filter: blur(2px) brightness(0.6);
+  }
+  50% { 
+    background-position: 52% 48%;
+    filter: blur(1.5px) brightness(0.7);
+  }
+}
+
+.bg-drift {
+  animation: bg-drift 20s ease-in-out infinite;
+}
