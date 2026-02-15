@@ -146,6 +146,74 @@ sudo firewall-cmd --add-port=3335/tcp --permanent
 sudo firewall-cmd --reload
 ```
 
+## HTTPS Setup (Required for Vercel Frontend)
+
+**⚠️ IMPORTANT:** If your frontend is on Vercel (HTTPS), your backend MUST also be HTTPS, or browsers will block requests (mixed content error).
+
+### Option 1: Nginx Reverse Proxy with Let's Encrypt (Recommended)
+
+```bash
+# Install nginx and certbot
+sudo apt update
+sudo apt install nginx certbot python3-certbot-nginx
+
+# Create nginx config
+sudo nano /etc/nginx/sites-available/monadologia
+
+# Add this config:
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    location / {
+        proxy_pass http://localhost:3335;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# Enable site
+sudo ln -s /etc/nginx/sites-available/monadologia /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+
+# Get SSL certificate
+sudo certbot --nginx -d your-domain.com
+
+# Update Vercel env var:
+# NEXT_PUBLIC_API_URL=https://your-domain.com
+```
+
+### Option 2: Cloudflare Tunnel (No Domain Needed)
+
+```bash
+# Install cloudflared
+wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+chmod +x cloudflared-linux-amd64
+sudo mv cloudflared-linux-amd64 /usr/local/bin/cloudflared
+
+# Create tunnel
+cloudflared tunnel --url http://localhost:3335
+
+# Use the HTTPS URL it provides in Vercel env var
+```
+
+### Option 3: ngrok (Quick Testing)
+
+```bash
+# Install ngrok
+wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
+tar -xzf ngrok-v3-stable-linux-amd64.tgz
+sudo mv ngrok /usr/local/bin/
+
+# Create tunnel
+ngrok http 3335
+
+# Use the HTTPS URL (e.g., https://abc123.ngrok.io) in Vercel
+```
+
 ## Health Check
 
 Test the server:

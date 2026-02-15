@@ -8,6 +8,7 @@ import { ConnectionModal } from '@/components/ConnectionModal';
 import { DocsView } from '@/components/DocsView';
 import { MathView } from '@/components/MathView';
 import { WorldStats } from '@/components/WorldStats';
+import { ConnectionError } from '@/components/ConnectionError';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://80.225.209.87:3335';
 
@@ -128,6 +129,8 @@ export default function Home() {
   // ─── DASHBOARD ──────────────────────────────────────────
   return (
     <div className={`relative min-h-screen overflow-hidden transition-opacity duration-700 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
+      {/* Connection Error Banner */}
+      <ConnectionError apiUrl={API_URL} />
       {/* Background Image (subtle) */}
       <div
         className="absolute inset-0 bg-cover bg-center opacity-15 bg-drift"

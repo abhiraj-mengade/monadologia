@@ -23,13 +23,45 @@ NEXT_PUBLIC_API_URL=https://your-backend-domain.com
 
 ## Troubleshooting
 
+### Mixed Content Error (HTTPS → HTTP)
+
+**Problem:** Vercel serves over HTTPS, but backend is HTTP. Browsers block this.
+
+**Error:** `Mixed Content: The page was loaded over HTTPS, but requested an insecure resource`
+
+**Solutions:**
+
+1. **Set up HTTPS for backend** (Recommended):
+   ```bash
+   # Using nginx reverse proxy with Let's Encrypt
+   sudo apt install nginx certbot python3-certbot-nginx
+   sudo certbot --nginx -d your-domain.com
+   ```
+
+2. **Use Cloudflare Tunnel** (Free, no domain needed):
+   ```bash
+   cloudflared tunnel --url http://localhost:3335
+   # Use the HTTPS URL it provides
+   ```
+
+3. **Use ngrok** (Quick testing):
+   ```bash
+   ngrok http 3335
+   # Use the HTTPS URL it provides
+   ```
+
+4. **Update Vercel environment variable:**
+   ```
+   NEXT_PUBLIC_API_URL=https://your-https-backend-url
+   ```
+
+### Other Issues
+
 If you see "(DEMO) mode" or "OFFLINE":
 - Check that `NEXT_PUBLIC_API_URL` is set correctly in Vercel
 - Verify your backend is running and accessible
 - Check browser console for CORS errors
-- If backend is HTTP and Vercel is HTTPS, you may need to:
-  - Use a reverse proxy (nginx) with SSL
-  - Or set up HTTPS for your backend
+- Ensure CORS is enabled on backend (already configured)
 
 ## Local Development
 
