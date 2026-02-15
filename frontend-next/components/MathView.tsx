@@ -150,6 +150,61 @@ export function MathView({ apiUrl }: MathViewProps) {
         })}
       </div>
 
+      {/* Monad Blockchain Connection Section */}
+      <div className="parchment-terminal p-8 rounded-lg mb-8 border-2 border-monad-teal/30">
+        <h2 className="font-serif text-3xl text-monad-teal mb-6 flex items-center gap-3">
+          ⛓️ The Monad Blockchain Connection
+        </h2>
+        
+        <p className="text-monad-cream/80 leading-relaxed text-sm mb-6">
+          This simulation is a playful exploration of the mathematical foundations that underpin <strong className="text-monad-teal">Monad blockchain</strong>. The same category theory principles that govern our chaotic apartment building also power one of the most advanced blockchain architectures.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-monad-deep/50 p-4 rounded border border-monad-burgundy/30">
+            <div className="text-monad-gold font-bold mb-2 flex items-center gap-2">
+              🔄 Parallel Execution
+            </div>
+            <p className="text-xs text-monad-cream/70 leading-relaxed">
+              Agents acting simultaneously across different floors (monads) mirrors Monad's parallel execution engine — multiple transactions processing at once without conflicts.
+            </p>
+          </div>
+
+          <div className="bg-monad-deep/50 p-4 rounded border border-monad-burgundy/30">
+            <div className="text-monad-gold font-bold mb-2 flex items-center gap-2">
+              🔗 State Transitions
+            </div>
+            <p className="text-xs text-monad-cream/70 leading-relaxed">
+              Each block in a blockchain is a monadic operation — transforming state predictably and composably, just like our gossip chains transform rumors through personality lenses.
+            </p>
+          </div>
+
+          <div className="bg-monad-deep/50 p-4 rounded border border-monad-burgundy/30">
+            <div className="text-monad-gold font-bold mb-2 flex items-center gap-2">
+              🧩 Smart Contract Composability
+            </div>
+            <p className="text-xs text-monad-cream/70 leading-relaxed">
+              Kleisli composition (party vibes chaining) is exactly how smart contracts compose — each function takes context, transforms it, and passes it to the next. Order matters!
+            </p>
+          </div>
+
+          <div className="bg-monad-deep/50 p-4 rounded border border-monad-burgundy/30">
+            <div className="text-monad-gold font-bold mb-2 flex items-center gap-2">
+              ⚖️ Consensus as Runtime
+            </div>
+            <p className="text-xs text-monad-cream/70 leading-relaxed">
+              The Landlord enforces monad laws in our building. Monad's consensus mechanism enforces validity in the blockchain. Both are runtime systems ensuring mathematical correctness.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 pt-6 border-t border-monad-teal/20">
+          <p className="text-sm text-monad-cream/60 italic text-center">
+            From Leibniz's 1714 philosophy → Haskell's functional programming → Monad blockchain's distributed systems — it's monads all the way down. 🐢⛓️
+          </p>
+        </div>
+      </div>
+
       {/* Philosophy Section */}
       <div className="parchment-terminal p-8 rounded-lg monad-glow-gold mb-8">
         <h2 className="font-serif text-3xl text-monad-gold mb-6">
@@ -180,17 +235,6 @@ export function MathView({ apiUrl }: MathViewProps) {
             </div>
           </div>
 
-          {/* Blockchain Connection */}
-          {mathData.philosophy.blockchain && (
-            <div className="pt-6 border-t border-monad-burgundy/30">
-              <h3 className="font-bold text-monad-teal mb-3 text-lg flex items-center gap-2">
-                ⛓️ The Monad Blockchain Connection
-              </h3>
-              <p className="text-monad-cream/80 leading-relaxed text-sm">
-                {mathData.philosophy.blockchain}
-              </p>
-            </div>
-          )}
         </div>
       </div>
 
