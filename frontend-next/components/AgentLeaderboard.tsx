@@ -53,8 +53,9 @@ export function AgentLeaderboard({ apiUrl }: AgentLeaderboardProps) {
         if (agentList.length > 0) {
           setAgents(agentList);
         }
-      } catch {
-        // Keep demo agents
+      } catch (err) {
+        console.error('Failed to fetch leaderboard:', err);
+        // Keep existing agents, don't replace with demo
       }
     };
 

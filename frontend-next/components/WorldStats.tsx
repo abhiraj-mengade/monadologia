@@ -33,6 +33,7 @@ export function WorldStats({ apiUrl }: WorldStatsProps) {
       } catch (err) {
         console.error('Failed to fetch stats:', err);
         setStats(prev => ({ ...prev, online: false }));
+        // Keep trying - don't give up
       }
     };
 

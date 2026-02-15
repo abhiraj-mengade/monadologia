@@ -109,9 +109,13 @@ export function BuildingView({ apiUrl, mathMode }: BuildingViewProps) {
         setIsOffline(false);
       } catch (err) {
         console.error('Failed to fetch building:', err, 'API URL:', apiUrl);
-        setBuilding(prev => prev || DEMO_BUILDING);
+        // Don't use demo data - show error state instead
         setIsOffline(true);
         setLoading(false);
+        if (!building) {
+          // Only set demo if absolutely no data exists
+          setBuilding(DEMO_BUILDING);
+        }
       }
     };
 

@@ -84,8 +84,9 @@ export function NarrativeFeed({ apiUrl }: NarrativeFeedProps) {
         if (data.stories && data.stories.length > 0) {
           setStories(data.stories);
         }
-      } catch {
-        // Keep demo stories
+      } catch (err) {
+        console.error('Failed to fetch stories:', err);
+        // Keep existing stories, don't replace with demo
       }
     };
 
