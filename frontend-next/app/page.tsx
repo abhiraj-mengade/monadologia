@@ -9,7 +9,11 @@ import { DocsView } from '@/components/DocsView';
 import { MathView } from '@/components/MathView';
 import { WorldStats } from '@/components/WorldStats';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://80.225.209.87:3335';
+// Use Next.js API proxy to avoid mixed content issues (HTTPS → HTTP)
+// The proxy runs server-side and can make HTTP requests
+const API_URL = typeof window !== 'undefined' 
+  ? '/api/proxy'  // Client-side: use Next.js API proxy
+  : (process.env.NEXT_PUBLIC_API_URL || 'http://80.225.209.87:3335'); // Server-side: direct
 
 type Tab = 'dashboard' | 'docs' | 'math';
 
