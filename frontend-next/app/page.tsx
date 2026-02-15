@@ -266,6 +266,7 @@ export default function Home() {
       {showConnection && (
         <ConnectionModal
           apiUrl={API_URL}
+          backendUrl={BACKEND_URL}
           onClose={() => setShowConnection(false)}
         />
       )}
