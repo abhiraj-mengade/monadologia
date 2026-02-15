@@ -62,7 +62,17 @@ cd monadologia
 The script will automatically:
 - Create a Python virtual environment
 - Install all dependencies (`pip install -r requirements.txt`)
-- Start the server on **port 3335** (configured for Oracle VPS)
+- Start the server **in background** on **port 3335** (configured for Oracle VPS)
+- Save logs to `monadologia.log`
+
+**Server Management:**
+```bash
+./start_server.sh      # Start server in background
+./stop_server.sh       # Stop server
+./restart_server.sh    # Restart server
+./server_status.sh     # Check status and view logs
+tail -f monadologia.log # Follow logs in real-time
+```
 
 Access at `http://YOUR_VPS_IP:3335`
 
