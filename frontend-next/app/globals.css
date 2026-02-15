@@ -70,26 +70,26 @@ body {
 
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(15, 10, 46, 0.5);
+  background: rgba(15, 10, 46, 0.3);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(61, 217, 196, 0.3);
-  border-radius: 4px;
+  background: rgba(61, 217, 196, 0.2);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(61, 217, 196, 0.5);
+  background: rgba(61, 217, 196, 0.4);
 }
 
 /* Pulse Animation for Live Indicator */
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  50% { opacity: 0.4; }
 }
 
 .pulse {
@@ -100,14 +100,59 @@ body {
 @keyframes bg-drift {
   0%, 100% { 
     background-position: center center;
-    filter: blur(2px) brightness(0.6);
+    transform: scale(1.05);
+    filter: blur(1px) brightness(0.7);
   }
-  50% { 
+  33% { 
     background-position: 52% 48%;
-    filter: blur(1.5px) brightness(0.7);
+    transform: scale(1.08);
+    filter: blur(0.5px) brightness(0.75);
+  }
+  66% { 
+    background-position: 48% 52%;
+    transform: scale(1.06);
+    filter: blur(1.5px) brightness(0.65);
   }
 }
 
 .bg-drift {
-  animation: bg-drift 20s ease-in-out infinite;
+  animation: bg-drift 30s ease-in-out infinite;
+}
+
+/* Fancy button glow */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(61, 217, 196, 0.2), 0 0 40px rgba(61, 217, 196, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(61, 217, 196, 0.4), 0 0 60px rgba(61, 217, 196, 0.2);
+  }
+}
+
+.glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+/* Floating particles effect */
+@keyframes float-up {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-10vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* Selection */
+::selection {
+  background: rgba(61, 217, 196, 0.3);
+  color: #faf3e0;
 }

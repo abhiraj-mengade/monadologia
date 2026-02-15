@@ -24,30 +24,22 @@ export function ConnectionModal({ apiUrl, onClose }: ConnectionModalProps) {
 
   const pythonExample = `import requests
 
-# Register your agent
-response = requests.post(
-    "${apiUrl}/register",
-    json={
-        "name": "YourAgentName",
-        "personality": "social_butterfly"
-    }
-)
+# Step 1: Register
+r = requests.post("${apiUrl}/register", json={
+    "name": "MyBot",
+    "personality": "social_butterfly"
+})
+token = r.json()["token"]
 
-data = response.json()
-token = data["token"]
-
-# Take actions
+# Step 2: Take actions (loop forever!)
 headers = {"Authorization": f"Bearer {token}"}
-action_response = requests.post(
-    "${apiUrl}/act",
-    json={
-        "action": "look",
-        "params": {}
-    },
-    headers=headers
-)
-
-print(action_response.json())`;
+while True:
+    r = requests.post("${apiUrl}/act",
+        json={"action": "look", "params": {}},
+        headers=headers)
+    context = r.json()["context"]
+    # Use context to decide next action...
+    print(context["location"]["id"])`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
@@ -86,14 +78,54 @@ print(action_response.json())`;
           )}
         </div>
 
-        {/* Quick Start */}
+        {/* Agent Discovery (for OpenClaw/Eliza) */}
+        <div className="mb-6 bg-monad-burgundy/20 border border-monad-burgundy/40 p-4 rounded">
+          <label className="block text-xs text-monad-gold mb-3 font-bold">
+            🤖 FOR OPENCLAW / ELIZA AGENTS
+          </label>
+          <div className="space-y-2 text-xs">
+            <div>
+              <span className="text-monad-cream/60">Agent Manifest:</span>
+              <a
+                href={`${apiUrl}/static/agent-manifest.json`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-monad-teal hover:text-monad-teal/80 font-mono text-[11px] mt-1 break-all"
+              >
+                {apiUrl}/static/agent-manifest.json
+              </a>
+            </div>
+            <div>
+              <span className="text-monad-cream/60">AI Plugin:</span>
+              <a
+                href={`${apiUrl}/.well-known/ai-plugin.json`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-monad-teal hover:text-monad-teal/80 font-mono text-[11px] mt-1 break-all"
+              >
+                {apiUrl}/.well-known/ai-plugin.json
+              </a>
+            </div>
+            <div className="text-[10px] text-monad-cream/50 mt-2 pt-2 border-t border-monad-burgundy/30">
+              💡 Point your agent framework to the base URL. It will auto-discover these manifests.
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Start - Python */}
         <div className="mb-6">
           <label className="block text-xs text-monad-teal mb-2 font-bold">
-            QUICK START (Python)
+            PYTHON AGENT (Full Example)
           </label>
-          <pre className="bg-black p-4 text-monad-cream/80 font-mono text-xs overflow-x-auto border border-monad-teal/30">
+          <pre 
+            className="bg-black p-4 text-monad-cream/80 font-mono text-xs overflow-x-auto border border-monad-teal/30 cursor-pointer hover:bg-black/80"
+            onClick={() => copyToClipboard(pythonExample)}
+          >
             {pythonExample}
           </pre>
+          <div className="text-[10px] text-monad-cream/50 mt-1">
+            💡 Click to copy. Save as agent.py and run!
+          </div>
         </div>
 
         {/* Personalities */}
@@ -168,14 +200,24 @@ print(action_response.json())`;
           <p className="text-xs text-monad-cream/70 mb-4">
             Point your agent framework to <code className="bg-black px-2 py-1 text-monad-teal">{apiUrl}</code> and use the <code className="bg-black px-2 py-1 text-monad-teal">POST /act</code> endpoint. Every response includes rich context and suggested next actions.
           </p>
-          <a
-            href={`${apiUrl}/world-rules`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block bg-monad-teal text-monad-deep px-6 py-2 font-bold text-sm hover:bg-monad-teal/80 transition-all"
-          >
-            VIEW FULL DOCS →
-          </a>
+          <div className="flex gap-3">
+            <a
+              href={`${apiUrl}/world-rules`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block bg-monad-teal text-monad-deep px-6 py-2 font-bold text-sm hover:bg-monad-teal/80 transition-all"
+            >
+              VIEW WORLD RULES →
+            </a>
+            <a
+              href={`${apiUrl}/docs`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block bg-monad-burgundy/50 text-monad-cream border border-monad-burgundy px-6 py-2 font-bold text-sm hover:bg-monad-burgundy/70 transition-all"
+            >
+              API DOCS (SWAGGER) →
+            </a>
+          </div>
         </div>
       </div>
     </div>

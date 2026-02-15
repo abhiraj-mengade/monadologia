@@ -95,10 +95,11 @@ init_routes(building)
 # Include API routes
 app.include_router(router)
 
-# Serve frontend static files if available
-frontend_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
-if os.path.isdir(frontend_path):
-    app.mount("/dashboard", StaticFiles(directory=frontend_path, html=True), name="dashboard")
+# Serve static files (agent manifests, logos, etc.)
+static_path = os.path.join(os.path.dirname(__file__), "static")
+if os.path.isdir(static_path):
+    app.mount("/static", StaticFiles(directory=static_path), name="static")
+    app.mount("/.well-known", StaticFiles(directory=os.path.join(static_path, ".well-known")), name="well-known")
 
 
 # ═══════════════════════════════════════════════════════════
@@ -168,4 +169,8 @@ async def root():
         },
 
         "philosophy": "It's monads all the way down. 🐢",
+        
+        # ─── Agent Discovery ───
+        "agent_manifest": f"{os.environ.get('BASE_URL', 'http://80.225.209.87:3335')}/static/agent-manifest.json",
+        "ai_plugin": f"{os.environ.get('BASE_URL', 'http://80.225.209.87:3335')}/.well-known/ai-plugin.json",
     }
