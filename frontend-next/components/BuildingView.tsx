@@ -92,14 +92,23 @@ export function BuildingView({ apiUrl, mathMode }: BuildingViewProps) {
   useEffect(() => {
     const fetchBuilding = async () => {
       try {
-        const res = await fetch(`${apiUrl}/building`);
-        if (!res.ok) throw new Error('Failed to fetch');
+        const res = await fetch(`${apiUrl}/building`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          },
+        });
+        
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+        
         const data = await res.json();
         setBuilding(data);
         setLoading(false);
         setIsOffline(false);
       } catch (err) {
-        console.error('Failed to fetch building:', err);
+        console.error('Failed to fetch building:', err, 'API URL:', apiUrl);
         setBuilding(prev => prev || DEMO_BUILDING);
         setIsOffline(true);
         setLoading(false);

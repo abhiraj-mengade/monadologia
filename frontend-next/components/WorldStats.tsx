@@ -12,7 +12,17 @@ export function WorldStats({ apiUrl }: WorldStatsProps) {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch(`${apiUrl}/`);
+        const res = await fetch(`${apiUrl}/`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          },
+        });
+        
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+        
         const data = await res.json();
         setStats({
           tick: data.current_state?.tick || 0,
@@ -20,7 +30,8 @@ export function WorldStats({ apiUrl }: WorldStatsProps) {
           gossip: data.current_state?.active_gossip || 0,
           online: true,
         });
-      } catch {
+      } catch (err) {
+        console.error('Failed to fetch stats:', err);
         setStats(prev => ({ ...prev, online: false }));
       }
     };
