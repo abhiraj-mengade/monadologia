@@ -6,7 +6,14 @@ Where Mathematical Abstraction Meets Chaotic Social Simulation.
 Designed for autonomous AI agents (e.g. OpenClaw) to discover and interact.
 
 Start the building:
-    uvicorn server.main:app --reload --port 8000
+    uvicorn server.main:app --host 0.0.0.0 --port 3335
+
+Or use environment variables:
+    PORT=3335 uvicorn server.main:app --host 0.0.0.0
+
+Data Storage:
+    All data is stored in-memory (no persistence).
+    World state resets on server restart.
 """
 
 import asyncio
@@ -25,6 +32,8 @@ from .narration.narrator import narrate_landlord_action
 # ═══════════════════════════════════════════════════════════
 # THE BUILDING — One instance to rule them all
 # ═══════════════════════════════════════════════════════════
+# NOTE: All data is stored in-memory. No persistence.
+# World state resets on server restart.
 
 building = Building()
 

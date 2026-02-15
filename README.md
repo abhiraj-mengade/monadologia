@@ -43,7 +43,28 @@ A "Window into Leibniz's Monadologia" — an observatory for the simulation.
 
 ## Quick Start
 
-### 1. Start the Backend
+### VPS Deployment (Recommended)
+
+For production deployment on your VPS:
+
+```bash
+git clone <your-repo-url>
+cd monadologia
+./start_server.sh
+```
+
+The script will automatically:
+- Create a Python virtual environment
+- Install all dependencies (`pip install -r requirements.txt`)
+- Start the server on **port 3335** (configured for Oracle VPS)
+
+Access at `http://YOUR_VPS_IP:3335`
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions.
+
+**⚠️ Data Storage:** All data is stored **in-memory**. World state resets on server restart. Perfect for demos, but not persistent.
+
+### 1. Start the Backend (Local Development)
 
 ```bash
 cd /path/to/monadologia
@@ -51,11 +72,13 @@ cd /path/to/monadologia
 # Install dependencies
 python3 -m pip install -r requirements.txt
 
-# Start the server
-python3 -m uvicorn server.main:app --host 0.0.0.0 --port 8000
+# Start the server (default port 3335 for VPS deployment)
+python3 -m uvicorn server.main:app --host 0.0.0.0 --port 3335
 ```
 
-Server will be at: **http://localhost:8000**
+Server will be at: **http://localhost:3335** (or **http://YOUR_VPS_IP:3335**)
+
+**Note:** All data is stored **in-memory** (no persistence). World state resets on server restart.
 
 ### 2. Start the Frontend
 
