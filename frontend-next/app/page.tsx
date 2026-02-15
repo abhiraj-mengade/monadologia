@@ -19,11 +19,14 @@ export default function Home() {
   const [mathMode, setMathMode] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
   const [fadeIn, setFadeIn] = useState(false);
-  const [splashReady, setSplashReady] = useState(false);
+  const [splashReady, setSplashReady] = useState(true); // Start visible immediately
 
   useEffect(() => {
-    // Small delay for splash text animation
-    setTimeout(() => setSplashReady(true), 300);
+    // Small fade-in animation
+    const timer = setTimeout(() => {
+      setSplashReady(true);
+    }, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -52,7 +55,7 @@ export default function Home() {
         }} />
 
         {/* Content */}
-        <div className={`relative z-10 h-full flex flex-col items-center justify-center transition-all duration-1000 ${splashReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+        <div className="relative z-10 h-full flex flex-col items-center justify-center" style={{ zIndex: 10 }}>
           {/* Title */}
           <div className="text-center mb-12">
             <h1 className="text-monad-gold mb-2">
@@ -79,15 +82,19 @@ export default function Home() {
 
           {/* Enter Button */}
           <button
-            onClick={() => setEntered(true)}
-            className="group relative px-16 py-5 text-lg font-bold tracking-widest transition-all duration-500 hover:scale-105"
+            onClick={() => {
+              console.log('Enter button clicked');
+              setEntered(true);
+            }}
+            className="group relative px-16 py-5 text-lg font-bold tracking-widest transition-all duration-500 hover:scale-105 cursor-pointer"
+            style={{ zIndex: 20, position: 'relative' }}
           >
             {/* Glow ring */}
-            <div className="absolute inset-0 border-2 border-monad-teal/60 rounded transition-all duration-500 group-hover:border-monad-teal group-hover:shadow-[0_0_40px_rgba(61,217,196,0.4)]" />
+            <div className="absolute inset-0 border-2 border-monad-teal rounded transition-all duration-500 group-hover:border-monad-teal group-hover:shadow-[0_0_40px_rgba(61,217,196,0.6)]" />
             {/* Inner glow */}
-            <div className="absolute inset-[2px] bg-monad-deep/60 backdrop-blur-sm rounded" />
+            <div className="absolute inset-[2px] bg-monad-deep/80 backdrop-blur-sm rounded" />
             {/* Text */}
-            <span className="relative z-10 text-monad-teal group-hover:text-monad-cream transition-colors">
+            <span className="relative z-10 text-monad-teal font-bold group-hover:text-monad-cream transition-colors" style={{ pointerEvents: 'none' }}>
               ENTER THE MONAD
             </span>
           </button>
