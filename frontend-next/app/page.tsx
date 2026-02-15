@@ -129,8 +129,6 @@ export default function Home() {
   // ─── DASHBOARD ──────────────────────────────────────────
   return (
     <div className={`relative min-h-screen overflow-hidden transition-opacity duration-700 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
-      {/* Connection Error Banner */}
-      <ConnectionError apiUrl={API_URL} />
       {/* Background Image (subtle) */}
       <div
         className="absolute inset-0 bg-cover bg-center opacity-15 bg-drift"
@@ -264,6 +262,9 @@ export default function Home() {
           onClose={() => setShowConnection(false)}
         />
       )}
+
+      {/* Connection Error Warning (for HTTPS/HTTP mixed content) */}
+      <ConnectionError apiUrl={API_URL} />
     </div>
   );
 }

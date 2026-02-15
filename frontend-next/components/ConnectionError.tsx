@@ -6,32 +6,31 @@ interface ConnectionErrorProps {
 
 export function ConnectionError({ apiUrl }: ConnectionErrorProps) {
   const isHttp = apiUrl.startsWith('http://');
-  const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
+  const isHttps = apiUrl.startsWith('https://');
 
-  if (!isHttp || !isHttps) return null;
+  if (!isHttp) return null; // Only show if using HTTP
 
   return (
-    <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 max-w-2xl mx-4">
-      <div className="bg-red-900/90 border-2 border-red-500 p-4 rounded-lg shadow-lg">
-        <div className="flex items-start gap-3">
-          <div className="text-2xl">⚠️</div>
-          <div className="flex-1">
-            <h3 className="font-bold text-red-200 mb-2">Mixed Content Error</h3>
-            <p className="text-sm text-red-100 mb-3">
-              Your frontend is served over HTTPS, but the backend is HTTP. Browsers block this for security.
+    <div className="fixed bottom-4 right-4 max-w-md bg-red-900/90 border-2 border-red-500 rounded-lg p-4 z-50 backdrop-blur-sm">
+      <div className="flex items-start gap-3">
+        <div className="text-2xl">⚠️</div>
+        <div className="flex-1">
+          <h3 className="font-bold text-red-200 mb-1">Mixed Content Error</h3>
+          <p className="text-sm text-red-100 mb-2">
+            Vercel serves over HTTPS, but your backend is HTTP. Browsers block this for security.
+          </p>
+          <div className="text-xs text-red-200/80 space-y-1">
+            <p><strong>Quick Fix:</strong> Set up HTTPS for your backend:</p>
+            <ul className="list-disc list-inside ml-2 space-y-0.5">
+              <li>Use nginx reverse proxy with Let's Encrypt</li>
+              <li>Or use Cloudflare Tunnel (free)</li>
+              <li>Or set <code className="bg-black/30 px-1 rounded">NEXT_PUBLIC_API_URL</code> to HTTPS endpoint</li>
+            </ul>
+          </div>
+          <div className="mt-3 pt-3 border-t border-red-500/30">
+            <p className="text-xs text-red-200/60">
+              Current API: <code className="bg-black/30 px-1 rounded">{apiUrl}</code>
             </p>
-            <div className="bg-black/30 p-3 rounded text-xs font-mono text-red-200 mb-3">
-              Backend: <span className="text-red-400">{apiUrl}</span>
-            </div>
-            <div className="text-xs text-red-200 space-y-1">
-              <p><strong>Solutions:</strong></p>
-              <ul className="list-disc list-inside ml-2 space-y-1">
-                <li>Set up HTTPS for your backend (SSL certificate)</li>
-                <li>Use a reverse proxy (nginx, Caddy) with SSL</li>
-                <li>Use Cloudflare Tunnel or ngrok for HTTPS</li>
-                <li>Set <code className="bg-black/50 px-1 rounded">NEXT_PUBLIC_API_URL</code> to HTTPS endpoint</li>
-              </ul>
-            </div>
           </div>
         </div>
       </div>
