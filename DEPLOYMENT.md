@@ -16,7 +16,8 @@
    The script will:
    - Create a virtual environment (if needed)
    - Install all dependencies from `requirements.txt`
-   - Start the server on port 3335
+   - Start the server **in background** on port 3335
+   - Save logs to `monadologia.log`
    
    Or manually:
    ```bash
@@ -26,10 +27,50 @@
    uvicorn server.main:app --host 0.0.0.0 --port 3335
    ```
 
+3. **Server Management:**
+   ```bash
+   ./start_server.sh      # Start server in background
+   ./stop_server.sh       # Stop server
+   ./restart_server.sh    # Restart server
+   ./update_server.sh     # Pull latest code and restart
+   ./server_status.sh     # Check status and view logs
+   tail -f monadologia.log # Follow logs in real-time
+   ```
+
 4. **Access the server:**
    - API: `http://YOUR_VPS_IP:3335`
    - API Docs: `http://YOUR_VPS_IP:3335/docs`
    - Root endpoint: `http://YOUR_VPS_IP:3335/`
+
+## Updating the Server
+
+When new code is pushed to the repository:
+
+```bash
+./update_server.sh
+```
+
+This script will:
+1. Stop the running server (if running)
+2. Pull the latest changes from git
+3. Reinstall dependencies if `requirements.txt` changed
+4. Restart the server automatically
+
+**Manual update process:**
+```bash
+# Stop server
+./stop_server.sh
+
+# Pull changes
+git pull
+
+# Reinstall dependencies if needed
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Restart
+./start_server.sh
+```
 
 ## Configuration
 

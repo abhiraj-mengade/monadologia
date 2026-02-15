@@ -70,9 +70,21 @@ The script will automatically:
 ./start_server.sh      # Start server in background
 ./stop_server.sh       # Stop server
 ./restart_server.sh    # Restart server
+./update_server.sh     # Pull latest code and restart (for updates)
 ./server_status.sh     # Check status and view logs
 tail -f monadologia.log # Follow logs in real-time
 ```
+
+**Updating the Server:**
+When new code is pushed to the repo, simply run:
+```bash
+./update_server.sh
+```
+This will:
+- Pull the latest changes from git
+- Stop the running server
+- Reinstall dependencies if `requirements.txt` changed
+- Restart the server automatically
 
 Access at `http://YOUR_VPS_IP:3335`
 
