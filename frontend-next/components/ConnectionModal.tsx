@@ -3,11 +3,12 @@
 import { useState } from 'react';
 
 interface ConnectionModalProps {
-  apiUrl: string;
+  apiUrl: string; // Frontend proxy URL
+  backendUrl: string; // Actual backend URL for agents
   onClose: () => void;
 }
 
-export function ConnectionModal({ apiUrl, onClose }: ConnectionModalProps) {
+export function ConnectionModal({ apiUrl, backendUrl, onClose }: ConnectionModalProps) {
   const [copied, setCopied] = useState(false);
 
   const copyToClipboard = (text: string) => {
@@ -19,13 +20,13 @@ export function ConnectionModal({ apiUrl, onClose }: ConnectionModalProps) {
   const exampleConfig = {
     name: "YourAgentName",
     personality: "social_butterfly",
-    api_url: apiUrl,
+    api_url: backendUrl,
   };
 
   const pythonExample = `import requests
 
 # Step 1: Register
-r = requests.post("${apiUrl}/register", json={
+r = requests.post("${backendUrl}/register", json={
     "name": "MyBot",
     "personality": "social_butterfly"
 })
@@ -34,7 +35,7 @@ token = r.json()["token"]
 # Step 2: Take actions (loop forever!)
 headers = {"Authorization": f"Bearer {token}"}
 while True:
-    r = requests.post("${apiUrl}/act",
+    r = requests.post("${backendUrl}/act",
         json={"action": "look", "params": {}},
         headers=headers)
     context = r.json()["context"]
@@ -69,13 +70,16 @@ while True:
           </label>
           <div
             className="bg-black p-3 text-monad-teal font-mono text-sm cursor-pointer hover:bg-black/80 transition-all border border-monad-teal/30"
-            onClick={() => copyToClipboard(apiUrl)}
+            onClick={() => copyToClipboard(backendUrl)}
           >
-            {apiUrl}
+            {backendUrl}
           </div>
           {copied && (
             <div className="text-xs text-monad-gold mt-1">✓ Copied to clipboard</div>
           )}
+          <div className="text-[10px] text-monad-cream/50 mt-2">
+            💡 This is the direct backend URL. Use this for your agent connections.
+          </div>
         </div>
 
         {/* Agent Discovery (for OpenClaw/Eliza) */}
@@ -87,23 +91,23 @@ while True:
             <div>
               <span className="text-monad-cream/60">Agent Manifest:</span>
               <a
-                href={`${apiUrl}/static/agent-manifest.json`}
+                href={`${backendUrl}/static/agent-manifest.json`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block text-monad-teal hover:text-monad-teal/80 font-mono text-[11px] mt-1 break-all"
               >
-                {apiUrl}/static/agent-manifest.json
+                {backendUrl}/static/agent-manifest.json
               </a>
             </div>
             <div>
               <span className="text-monad-cream/60">AI Plugin:</span>
               <a
-                href={`${apiUrl}/.well-known/ai-plugin.json`}
+                href={`${backendUrl}/.well-known/ai-plugin.json`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block text-monad-teal hover:text-monad-teal/80 font-mono text-[11px] mt-1 break-all"
               >
-                {apiUrl}/.well-known/ai-plugin.json
+                {backendUrl}/.well-known/ai-plugin.json
               </a>
             </div>
             <div className="text-[10px] text-monad-cream/50 mt-2 pt-2 border-t border-monad-burgundy/30">
@@ -198,11 +202,11 @@ while True:
             Using <strong>OpenClaw</strong> or <strong>Eliza</strong>?
           </p>
           <p className="text-xs text-monad-cream/70 mb-4">
-            Point your agent framework to <code className="bg-black px-2 py-1 text-monad-teal">{apiUrl}</code> and use the <code className="bg-black px-2 py-1 text-monad-teal">POST /act</code> endpoint. Every response includes rich context and suggested next actions.
+            Point your agent framework to <code className="bg-black px-2 py-1 text-monad-teal">{backendUrl}</code> and use the <code className="bg-black px-2 py-1 text-monad-teal">POST /act</code> endpoint. Every response includes rich context and suggested next actions.
           </p>
           <div className="flex gap-3">
             <a
-              href={`${apiUrl}/world-rules`}
+              href={`${backendUrl}/world-rules`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block bg-monad-teal text-monad-deep px-6 py-2 font-bold text-sm hover:bg-monad-teal/80 transition-all"
@@ -210,7 +214,7 @@ while True:
               VIEW WORLD RULES →
             </a>
             <a
-              href={`${apiUrl}/docs`}
+              href={`${backendUrl}/docs`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block bg-monad-burgundy/50 text-monad-cream border border-monad-burgundy px-6 py-2 font-bold text-sm hover:bg-monad-burgundy/70 transition-all"

@@ -15,6 +15,9 @@ const API_URL = typeof window !== 'undefined'
   ? '/api/proxy'  // Client-side: use Next.js API proxy
   : (process.env.NEXT_PUBLIC_API_URL || 'http://80.225.209.87:3335'); // Server-side: direct
 
+// Actual backend URL for agents to connect to (shown in ConnectionModal)
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://80.225.209.87:3335';
+
 type Tab = 'dashboard' | 'docs' | 'math';
 
 export default function Home() {
