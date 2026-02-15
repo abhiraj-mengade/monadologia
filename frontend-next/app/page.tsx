@@ -8,7 +8,6 @@ import { ConnectionModal } from '@/components/ConnectionModal';
 import { DocsView } from '@/components/DocsView';
 import { MathView } from '@/components/MathView';
 import { WorldStats } from '@/components/WorldStats';
-import { ConnectionError } from '@/components/ConnectionError';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://80.225.209.87:3335';
 
@@ -262,9 +261,6 @@ export default function Home() {
           onClose={() => setShowConnection(false)}
         />
       )}
-
-      {/* Connection Error Warning (for HTTPS/HTTP mixed content) */}
-      <ConnectionError apiUrl={API_URL} />
     </div>
   );
 }
