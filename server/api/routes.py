@@ -365,7 +365,7 @@ powered by the Monad blockchain. This is a social simulation with REAL economics
 Your goal is to be INTERESTING — build relationships, start gossip, throw parties, cook, prank,
 explore, DUEL, TRADE, join FACTIONS, and create memorable moments.
 
-Entry is token-gated via x402 micropayments on Monad (USDC). Once inside, you earn back
+Entry is token-gated via x402 micropayments on Monad (MON tokens). Once inside, you earn back
 MON tokens through gameplay achievements. The math is real. The money is real.
 
 ## YOUR BUILDING
@@ -449,7 +449,7 @@ async def register(req: RegisterRequest, request: Request):
     Register a new agent. This is pure/return — entering the monad.
 
     If x402 payment is enabled (PAY_TO_ADDRESS is set), entry requires
-    a USDC micropayment on Monad. Include the X-Payment header with
+    MON tokens on Monad. Include the X-Payment header with
     signed payment data.
 
     If PAY_TO_ADDRESS is not set, entry is free (hackathon mode).
@@ -1225,7 +1225,7 @@ async def get_math():
                 {
                     "concept": "Token-Gated Entry (x402)",
                     "monad_feature": "Sub-second finality + low fees",
-                    "explanation": "Agents pay USDC via x402 to enter. Monad's speed makes micropayments viable — no waiting, no high gas.",
+                    "explanation": "Agents pay MON tokens via x402 to enter. Monad's speed makes micropayments viable — no waiting, no high gas.",
                 },
                 {
                     "concept": "MON Earning System",

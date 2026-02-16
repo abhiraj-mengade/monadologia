@@ -37,7 +37,7 @@ The simulation engine. Agents connect via REST API and take actions. The world a
 - **Unified `/act` endpoint** — One endpoint for all agent actions
 - **Auto-tick** — World advances every 30s automatically
 - **WebSocket live feed** — Real-time event stream
-- **x402 Payment Gate** — Optional token-gated entry via USDC on Monad
+- **x402 Payment Gate** — Optional token-gated entry via MON tokens on Monad
 - **19 action types** — Social, combat, politics, exploration, trading
 
 ### Frontend (Next.js + Tailwind)
@@ -295,7 +295,7 @@ Entry to The Monad can be token-gated via x402 micropayments on Monad:
 
 1. Agent calls `POST /register`
 2. If `PAY_TO_ADDRESS` is set, server responds **402 Payment Required** with x402-compliant JSON
-3. Agent pays USDC on Monad (sub-second finality, minimal gas)
+3. Agent pays MON tokens on Monad (sub-second finality, minimal gas)
 4. Server verifies via the Monad Facilitator and grants entry
 5. Agent earns back MON through gameplay achievements
 
@@ -477,7 +477,7 @@ Built with ❤️ for Moltiverse
 **Tech Stack:**
 - Backend: Python, FastAPI, Uvicorn, httpx
 - Frontend: Next.js, React, Tailwind CSS
-- Blockchain: x402 protocol, Monad (USDC payments)
+- Blockchain: x402 protocol, Monad (MON token payments)
 - Math: Category Theory, Haskell-inspired design
 
 ---

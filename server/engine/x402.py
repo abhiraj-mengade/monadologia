@@ -7,7 +7,7 @@ minimal protocol for internet-native micropayments.
 Flow:
   1. Client requests a protected resource
   2. Server responds 402 with payment requirements JSON
-  3. Client pays with a signed ERC-20 transfer (USDC on Monad)
+  3. Client pays with a signed ERC-20 transfer (MON tokens on Monad)
   4. Server verifies via the Monad Facilitator
   5. Server serves the content
 
@@ -37,15 +37,18 @@ from fastapi.responses import JSONResponse
 
 # Monad Testnet
 MONAD_TESTNET = "eip155:10143"
-MONAD_USDC_TESTNET = "0x534b2f3A21130d7a60830c2Df862319e593943A3"
+# MON is the native token of Monad (no contract address needed)
+# For native token payments in x402, we use the standard native token address
+MONAD_MON_TESTNET = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"  # Standard address for native tokens
 
 # Monad Mainnet (when available)
 MONAD_MAINNET = "eip155:10143"  # Update chain ID when mainnet launches
-MONAD_USDC_MAINNET = MONAD_USDC_TESTNET  # Update when mainnet USDC is deployed
+MONAD_MON_MAINNET = MONAD_MON_TESTNET  # Same for native token
 
 # Active network configuration
 MONAD_NETWORK = os.environ.get("MONAD_NETWORK", MONAD_TESTNET)
-MONAD_USDC = os.environ.get("MONAD_USDC_ADDRESS", MONAD_USDC_TESTNET)
+# Allow override, but default to native token address
+MONAD_MON = os.environ.get("MONAD_MON_ADDRESS", MONAD_MON_TESTNET)
 
 # Facilitator
 FACILITATOR_URL = os.environ.get(
@@ -57,9 +60,9 @@ FACILITATOR_URL = os.environ.get(
 # Default: Monadologia treasury wallet. Override with PAY_TO_ADDRESS env var.
 PAY_TO_ADDRESS = os.environ.get("PAY_TO_ADDRESS", "0xFa592c3c9A4D4199929794fAbD9f1DE93899F95F")
 
-# Pricing
-ENTRY_PRICE = os.environ.get("ENTRY_PRICE", "$0.001")  # Cost to enter The Monad
-PREMIUM_ACTION_PRICE = os.environ.get("PREMIUM_ACTION_PRICE", "$0.0005")
+# Pricing (in MON tokens)
+ENTRY_PRICE = os.environ.get("ENTRY_PRICE", "0.001")  # Cost to enter The Monad (MON tokens, not USD)
+PREMIUM_ACTION_PRICE = os.environ.get("PREMIUM_ACTION_PRICE", "0.0005")
 
 
 # ═══════════════════════════════════════════════════════════
@@ -238,10 +241,10 @@ class X402PaymentGate:
                     "network": MONAD_NETWORK,
                     "payTo": PAY_TO_ADDRESS,
                     "price": self.price,
-                    "asset": MONAD_USDC,
+                    "asset": MONAD_MON,
                     "maxTimeoutSeconds": 300,
                     "extra": {
-                        "name": "USDC",
+                        "name": "MON",
                         "version": "2",
                     },
                 },
@@ -252,7 +255,7 @@ class X402PaymentGate:
                     "mimeType": "application/json",
                 },
                 "message": (
-                    "Welcome to The Monad. Entry requires a small USDC payment on Monad. "
+                    "Welcome to The Monad. Entry requires MON tokens on Monad. "
                     "This is token-gated entry — pay once, play forever. "
                     "Your agent will earn back MON through gameplay achievements."
                 ),
@@ -290,12 +293,12 @@ class X402PaymentGate:
                 "accepted": {
                     "scheme": "exact",
                     "network": MONAD_NETWORK,
-                    "amount": str(int(float(self.price.replace("$", "")) * 1_000_000)),
-                    "asset": MONAD_USDC,
+                    "amount": str(int(float(self.price.replace("$", "")) * 1_000_000)),  # MON has 18 decimals typically
+                    "asset": MONAD_MON,
                     "payTo": PAY_TO_ADDRESS,
                     "maxTimeoutSeconds": 300,
                     "extra": {
-                        "name": "USDC",
+                        "name": "MON",
                         "version": "2",
                     },
                 },
