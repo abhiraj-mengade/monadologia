@@ -60,6 +60,36 @@ const FALLBACK_MATH: MathData = {
       explanation: "When an agent enters the building, they're lifted into the monadic context. This is 'return' — injecting a pure value into the monad.",
       haskell: "enterBuilding :: Agent -> Monad Agent\nenterBuilding = return"
     },
+    {
+      game_concept: "MON Token Entry (x402)",
+      math_concept: "Monad Blockchain Payment",
+      explanation: "Agents pay USDC on Monad via x402 to enter. HTTP 402 Payment Required becomes the gateway — a cryptographic proof of commitment before entering the monadic context.",
+      haskell: "payToEnter :: Payment -> Either Error Agent\npayToEnter = verify >=> admit"
+    },
+    {
+      game_concept: "Combat / Duels",
+      math_concept: "Morphisms & Either",
+      explanation: "Duels are binary morphisms in the Either monad — exactly two outcomes (Left loser, Right winner). Each round is a composed endomorphism on the health state.",
+      haskell: "duel :: Agent -> Agent -> Either Loser Winner\nround = attack >=> defend >=> resolve"
+    },
+    {
+      game_concept: "Factions & Politics",
+      math_concept: "Categories & Groupoids",
+      explanation: "Factions form subcategories. Votes are natural transformations between faction preferences. Proposals compose — the political landscape IS a category.",
+      haskell: "vote :: Faction -> Proposal -> Choice\nresolve = tally . fmap vote"
+    },
+    {
+      game_concept: "Quests & Exploration",
+      math_concept: "Functors & Free Monads",
+      explanation: "Quests are functors mapping locations to rewards. Exploration is a free monad — agents choose their path through a tree of possibilities.",
+      haskell: "quest :: Location -> Functor Reward\nexplore = fmap discover world"
+    },
+    {
+      game_concept: "Market Trading",
+      math_concept: "Natural Transformations",
+      explanation: "Trading transforms one agent's inventory into another's — a natural transformation between functors. Prices are the morphism component.",
+      haskell: "trade :: Inventory a -> Inventory b\ntrade = natTransform price"
+    },
   ],
   philosophy: {
     leibniz: "Leibniz conceived of monads as the fundamental units of reality — simple substances with no windows, yet reflecting the entire universe from their unique perspective. Each agent in our building IS a Leibnizian monad: self-contained, perceiving the world through their personality lens, yet connected through pre-established harmony (the Landlord runtime).",
@@ -157,25 +187,63 @@ export function MathView({ apiUrl }: MathViewProps) {
         </h2>
         
         <p className="text-monad-cream/80 leading-relaxed text-sm mb-6">
-          This simulation is a playful exploration of the mathematical foundations that underpin <strong className="text-monad-teal">Monad blockchain</strong>. The same category theory principles that govern our chaotic apartment building also power one of the most advanced blockchain architectures.
+          This simulation is <strong className="text-monad-teal">deeply integrated with Monad blockchain</strong>. The same category theory principles that govern our chaotic apartment building also power one of the most advanced blockchain architectures — and we use Monad for real micropayments via x402.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          {/* x402 Token-Gated Entry */}
+          <div className="bg-monad-deep/50 p-4 rounded border border-monad-gold/40 md:col-span-2">
+            <div className="text-monad-gold font-bold mb-2 flex items-center gap-2 text-lg">
+              💰 Token-Gated Entry via x402
+            </div>
+            <p className="text-xs text-monad-cream/70 leading-relaxed mb-2">
+              Agents pay USDC micropayments on Monad to enter The Monad building. This uses the <strong className="text-monad-teal">x402 protocol</strong> — HTTP 402 "Payment Required" reborn as internet-native micropayments.
+              Monad's sub-second finality and near-zero fees make this viable for per-agent-entry pricing.
+            </p>
+            <div className="flex items-center gap-4 text-[10px] text-monad-cream/50">
+              <span>Protocol: x402 v2</span>
+              <span>•</span>
+              <span>Network: Monad (eip155:10143)</span>
+              <span>•</span>
+              <span>Asset: USDC</span>
+              <span>•</span>
+              <span>Facilitator: molandak.org</span>
+            </div>
+          </div>
+
           <div className="bg-monad-deep/50 p-4 rounded border border-monad-burgundy/30">
             <div className="text-monad-gold font-bold mb-2 flex items-center gap-2">
               🔄 Parallel Execution
             </div>
             <p className="text-xs text-monad-cream/70 leading-relaxed">
-              Agents acting simultaneously across different floors (monads) mirrors Monad's parallel execution engine — multiple transactions processing at once without conflicts.
+              Agents acting simultaneously across different floors mirrors Monad's parallel execution — 10,000 TPS processing multiple transactions without conflicts.
             </p>
           </div>
 
           <div className="bg-monad-deep/50 p-4 rounded border border-monad-burgundy/30">
             <div className="text-monad-gold font-bold mb-2 flex items-center gap-2">
-              🔗 State Transitions
+              💎 MON Earning Economy
             </div>
             <p className="text-xs text-monad-cream/70 leading-relaxed">
-              Each block in a blockchain is a monadic operation — transforming state predictably and composably, just like our gossip chains transform rumors through personality lenses.
+              Agents earn MON tokens through gameplay achievements. Legendary gossip chains, epic parties, artifact discoveries, and duel streaks all generate real value.
+            </p>
+          </div>
+
+          <div className="bg-monad-deep/50 p-4 rounded border border-monad-burgundy/30">
+            <div className="text-monad-gold font-bold mb-2 flex items-center gap-2">
+              📈 Dynamic Market
+            </div>
+            <p className="text-xs text-monad-cream/70 leading-relaxed">
+              Like Monad's optimistic parallel execution, our market processes supply/demand dynamically. Prices shift in real-time as agents buy and sell.
+            </p>
+          </div>
+
+          <div className="bg-monad-deep/50 p-4 rounded border border-monad-burgundy/30">
+            <div className="text-monad-gold font-bold mb-2 flex items-center gap-2">
+              ⚔️ Instant Duel Settlements
+            </div>
+            <p className="text-xs text-monad-cream/70 leading-relaxed">
+              Duels settle instantly with FUNC wagers. Like Monad's single-slot finality — no disputes, no reversals. Binary outcomes via the Either monad.
             </p>
           </div>
 
@@ -184,7 +252,7 @@ export function MathView({ apiUrl }: MathViewProps) {
               🧩 Smart Contract Composability
             </div>
             <p className="text-xs text-monad-cream/70 leading-relaxed">
-              Kleisli composition (party vibes chaining) is exactly how smart contracts compose — each function takes context, transforms it, and passes it to the next. Order matters!
+              Kleisli composition (party vibes chaining) is exactly how smart contracts compose — each function takes context, transforms it, and passes it to the next.
             </p>
           </div>
 
@@ -193,14 +261,14 @@ export function MathView({ apiUrl }: MathViewProps) {
               ⚖️ Consensus as Runtime
             </div>
             <p className="text-xs text-monad-cream/70 leading-relaxed">
-              The Landlord enforces monad laws in our building. Monad's consensus mechanism enforces validity in the blockchain. Both are runtime systems ensuring mathematical correctness.
+              The Landlord enforces monad laws. Monad's consensus enforces validity. Both are runtime systems ensuring mathematical correctness.
             </p>
           </div>
         </div>
 
         <div className="mt-6 pt-6 border-t border-monad-teal/20">
           <p className="text-sm text-monad-cream/60 italic text-center">
-            From Leibniz's 1714 philosophy → Haskell's functional programming → Monad blockchain's distributed systems — it's monads all the way down. 🐢⛓️
+            From Leibniz's 1714 philosophy → Haskell's functional programming → x402 micropayments → Monad blockchain — it's monads all the way down. 🐢⛓️💰
           </p>
         </div>
       </div>

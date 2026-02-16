@@ -24,6 +24,17 @@ const TYPE_CONFIG: Record<string, { icon: string; color: string; label: string }
   prank: { icon: '😈', color: 'border-l-red-400', label: 'PRANK' },
   talk: { icon: '💬', color: 'border-l-cyan-400', label: 'TALK' },
   board: { icon: '📋', color: 'border-l-gray-400', label: 'BOARD' },
+  // New mechanics
+  duel: { icon: '⚔️', color: 'border-l-red-500', label: 'DUEL' },
+  join_faction: { icon: '🏛️', color: 'border-l-indigo-400', label: 'FACTION' },
+  propose_vote: { icon: '🗳️', color: 'border-l-indigo-300', label: 'PROPOSE' },
+  cast_vote: { icon: '✋', color: 'border-l-indigo-200', label: 'VOTE' },
+  vote_resolved: { icon: '📊', color: 'border-l-indigo-500', label: 'RESOLVED' },
+  complete_quest: { icon: '🏆', color: 'border-l-amber-400', label: 'QUEST' },
+  discover_artifact: { icon: '💎', color: 'border-l-violet-400', label: 'ARTIFACT' },
+  list_item: { icon: '🏷️', color: 'border-l-lime-400', label: 'LIST' },
+  buy_item: { icon: '💰', color: 'border-l-lime-500', label: 'TRADE' },
+  agent_crashed: { icon: '💀', color: 'border-l-gray-600', label: 'CRASH' },
 };
 
 const DEMO_STORIES: Story[] = [

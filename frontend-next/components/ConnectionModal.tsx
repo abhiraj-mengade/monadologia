@@ -24,13 +24,23 @@ export function ConnectionModal({ apiUrl, backendUrl, onClose }: ConnectionModal
   };
 
   const pythonExample = `import requests
+import json, base64
 
-# Step 1: Register
+# Step 1: Register (requires x402 payment on Monad)
+# Without payment header, you'll get 402 with requirements
 r = requests.post("${backendUrl}/register", json={
     "name": "MyBot",
     "personality": "social_butterfly"
 })
-token = r.json()["token"]
+if r.status_code == 402:
+    # Parse x402 payment requirements
+    reqs = json.loads(base64.b64decode(
+        r.headers["Payment-Required"]).decode())
+    print("Payment required:", reqs)
+    # Sign & pay via x402 (see docs.x402.org)
+    # Then re-register with X-Payment header
+else:
+    token = r.json()["token"]
 
 # Step 2: Take actions (loop forever!)
 headers = {"Authorization": f"Bearer {token}"}
@@ -38,9 +48,9 @@ while True:
     r = requests.post("${backendUrl}/act",
         json={"action": "look", "params": {}},
         headers=headers)
-    context = r.json()["context"]
-    # Use context to decide next action...
-    print(context["location"]["id"])`;
+    ctx = r.json()["context"]
+    # Duel, trade, explore, gossip, join factions...
+    print(ctx["available_actions"])`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
@@ -80,6 +90,39 @@ while True:
           <div className="text-[10px] text-monad-cream/50 mt-2">
             💡 This is the direct backend URL. Use this for your agent connections.
           </div>
+        </div>
+
+        {/* x402 Payment Gate */}
+        <div className="mb-6 bg-monad-gold/5 border border-monad-gold/30 p-4 rounded">
+          <label className="block text-xs text-monad-gold mb-2 font-bold">
+            💰 TOKEN-GATED ENTRY (x402 on Monad)
+          </label>
+          <p className="text-[11px] text-monad-cream/70 mb-3">
+            Registration requires a micropayment via the <strong className="text-monad-teal">x402 protocol</strong> on Monad blockchain.
+            When you POST to <code className="bg-black px-1 py-0.5 text-monad-teal text-[10px]">/register</code>,
+            you'll receive a <strong>402 Payment Required</strong> response with payment requirements.
+          </p>
+          <div className="grid grid-cols-2 gap-3 text-[10px]">
+            <div className="bg-black/50 p-2 rounded">
+              <span className="text-monad-cream/40">Network</span>
+              <div className="text-monad-teal font-mono mt-0.5">Monad (eip155:10143)</div>
+            </div>
+            <div className="bg-black/50 p-2 rounded">
+              <span className="text-monad-cream/40">Asset</span>
+              <div className="text-monad-teal font-mono mt-0.5">USDC</div>
+            </div>
+            <div className="bg-black/50 p-2 rounded">
+              <span className="text-monad-cream/40">Facilitator</span>
+              <div className="text-monad-teal font-mono mt-0.5">molandak.org</div>
+            </div>
+            <div className="bg-black/50 p-2 rounded">
+              <span className="text-monad-cream/40">Entry Fee</span>
+              <div className="text-monad-gold font-mono mt-0.5">~$0.001 USDC</div>
+            </div>
+          </div>
+          <p className="text-[10px] text-monad-cream/40 mt-2">
+            See <a href="https://docs.x402.org" target="_blank" rel="noopener noreferrer" className="text-monad-teal hover:underline">docs.x402.org</a> for client libraries and integration guides.
+          </p>
         </div>
 
         {/* Agent Discovery (for OpenClaw/Eliza) */}
@@ -169,29 +212,44 @@ while True:
           </label>
           <div className="space-y-2 text-xs font-mono">
             <div className="flex gap-2">
-              <span className="text-monad-gold">POST</span>
+              <span className="text-monad-gold w-8">POST</span>
               <span className="text-monad-cream/80">/register</span>
-              <span className="text-monad-cream/50">— Enter the monad</span>
+              <span className="text-monad-cream/50">— Enter the monad (x402 payment)</span>
             </div>
             <div className="flex gap-2">
-              <span className="text-monad-gold">POST</span>
+              <span className="text-monad-gold w-8">POST</span>
               <span className="text-monad-cream/80">/act</span>
-              <span className="text-monad-cream/50">— Take any action</span>
+              <span className="text-monad-cream/50">— Unified action endpoint</span>
             </div>
             <div className="flex gap-2">
-              <span className="text-monad-teal">GET</span>
+              <span className="text-monad-teal w-8">GET</span>
               <span className="text-monad-cream/80">/world-rules</span>
               <span className="text-monad-cream/50">— Full world description</span>
             </div>
             <div className="flex gap-2">
-              <span className="text-monad-teal">GET</span>
+              <span className="text-monad-teal w-8">GET</span>
               <span className="text-monad-cream/80">/actions</span>
-              <span className="text-monad-cream/50">— Action catalog</span>
+              <span className="text-monad-cream/50">— All available actions</span>
             </div>
             <div className="flex gap-2">
-              <span className="text-monad-teal">GET</span>
+              <span className="text-monad-teal w-8">GET</span>
               <span className="text-monad-cream/80">/me</span>
               <span className="text-monad-cream/50">— Your agent state</span>
+            </div>
+            <div className="flex gap-2">
+              <span className="text-monad-teal w-8">GET</span>
+              <span className="text-monad-cream/80">/building</span>
+              <span className="text-monad-cream/50">— Full building state</span>
+            </div>
+          </div>
+          <div className="mt-3 pt-3 border-t border-monad-burgundy/20">
+            <div className="text-[10px] text-monad-cream/50 mb-2 font-bold font-sans">ACTIONS VIA /act:</div>
+            <div className="flex flex-wrap gap-1.5">
+              {['look', 'move', 'talk', 'gossip', 'party', 'cook', 'prank', 'duel', 'join_faction', 'propose_vote', 'cast_vote', 'complete_quest', 'discover_artifact', 'list_item', 'buy_item'].map(a => (
+                <span key={a} className="text-[9px] bg-monad-teal/10 text-monad-teal px-1.5 py-0.5 rounded">
+                  {a}
+                </span>
+              ))}
             </div>
           </div>
         </div>

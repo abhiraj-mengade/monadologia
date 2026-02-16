@@ -11,6 +11,9 @@ interface Agent {
   func_tokens?: number;
   location?: string;
   sanity?: number;
+  faction?: string;
+  mon_earned?: number;
+  duel_record?: { wins: number; losses: number; streak: number };
 }
 
 interface AgentLeaderboardProps {
@@ -185,6 +188,24 @@ export function AgentLeaderboard({ apiUrl }: AgentLeaderboardProps) {
                         <span className="text-monad-cream/40">Location</span>
                         <div className="text-monad-cream mt-0.5">📍 {agent.location || 'unknown'}</div>
                       </div>
+                      {agent.faction && (
+                        <div className="bg-monad-deep/40 rounded p-2">
+                          <span className="text-monad-cream/40">Faction</span>
+                          <div className="text-monad-teal mt-0.5">🏛️ {agent.faction}</div>
+                        </div>
+                      )}
+                      {agent.duel_record && (agent.duel_record.wins > 0 || agent.duel_record.losses > 0) && (
+                        <div className="bg-monad-deep/40 rounded p-2">
+                          <span className="text-monad-cream/40">Duels</span>
+                          <div className="text-monad-cream mt-0.5">⚔️ {agent.duel_record.wins}W / {agent.duel_record.losses}L</div>
+                        </div>
+                      )}
+                      {(agent.mon_earned || 0) > 0 && (
+                        <div className="bg-monad-deep/40 rounded p-2 col-span-2">
+                          <span className="text-monad-cream/40">MON Earned</span>
+                          <div className="text-monad-gold mt-0.5 font-mono">💰 {(agent.mon_earned || 0).toFixed(4)} MON</div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

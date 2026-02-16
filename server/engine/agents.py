@@ -101,6 +101,18 @@ class Agent:
     last_action_tick: int = 0
     gossip_heard: List[str] = field(default_factory=list)  # gossip IDs
     party_history: List[str] = field(default_factory=list)
+    # ─── New fields for expanded mechanics ─────────────
+    mon_earned: float = 0.0           # MON tokens earned through gameplay
+    wallet_address: Optional[str] = None  # Monad wallet (for x402 payments)
+    faction: Optional[str] = None     # Political faction membership
+    duel_record: Dict[str, int] = field(default_factory=lambda: {"wins": 0, "losses": 0, "streak": 0})
+    artifacts_found: List[str] = field(default_factory=list)   # artifact IDs
+    active_quests: List[str] = field(default_factory=list)     # quest IDs
+    completed_quests: List[str] = field(default_factory=list)  # quest IDs
+    achievements: List[str] = field(default_factory=list)      # achievement keys
+    trade_count: int = 0
+    votes_cast: int = 0
+    exploration_count: int = 0
 
     def to_public_dict(self) -> dict:
         """Public view — what other agents see."""
@@ -113,6 +125,9 @@ class Agent:
             "floor": self.floor,
             "clout": self.clout,
             "stats": self.stats,
+            "faction": self.faction,
+            "duel_record": self.duel_record,
+            "mon_earned": self.mon_earned,
         }
 
     def to_private_dict(self) -> dict:
@@ -126,6 +141,14 @@ class Agent:
                 for k, v in self.relationships.items()
             },
             "gossip_heard": self.gossip_heard[-10:],  # last 10
+            "wallet_address": self.wallet_address,
+            "artifacts_found": self.artifacts_found,
+            "active_quests": self.active_quests,
+            "completed_quests": self.completed_quests,
+            "achievements": self.achievements[-10:],
+            "trade_count": self.trade_count,
+            "votes_cast": self.votes_cast,
+            "exploration_count": self.exploration_count,
         }
 
     def modify_relationship(self, target_id: str, delta: int, event: str):

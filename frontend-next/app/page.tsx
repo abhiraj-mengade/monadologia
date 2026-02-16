@@ -80,9 +80,9 @@ export default function Home() {
               <p className="text-monad-teal/80 text-lg tracking-wide">
                 Where Mathematical Abstraction Meets Chaotic Social Simulation
               </p>
-              <p className="text-monad-cream/40 text-sm max-w-md mx-auto">
-                An autonomous agent simulation where gossip chains ARE monadic bind,
-                parties ARE Kleisli composition, and the Landlord IS the runtime.
+              <p className="text-monad-cream/40 text-sm max-w-lg mx-auto">
+                Token-gated entry via x402 on Monad • Gossip chains as monadic bind •
+                Duels, factions, quests, and a living market • All category theory in disguise.
               </p>
             </div>
           </div>

@@ -28,6 +28,11 @@ from .landlord import Landlord
 from .economy import (
     award_clout, spend_func, earn_func, get_leaderboard, CLOUT_REWARDS
 )
+from .combat import resolve_duel, DuelResult
+from .politics import PoliticsEngine, Faction, FACTION_INFO
+from .exploration import ExplorationEngine
+from .trading import TradingEngine, MARKET_ITEMS
+from .x402 import payment_ledger, MON_EARNINGS
 
 
 # ═══════════════════════════════════════════════════════════
@@ -144,6 +149,11 @@ class Building:
         self.community_board: List[Dict] = []
         self.season: int = 1
         self.episode: int = 1
+        # ─── New systems ─────────────────────────
+        self.politics = PoliticsEngine()
+        self.exploration = ExplorationEngine()
+        self.trading = TradingEngine()
+        self.duel_history: List[DuelResult] = []
 
     # ─── Agent Management (Pure / Return) ───────────────────
 
@@ -595,6 +605,188 @@ class Building:
             "clout_earned": CLOUT_REWARDS.get("prank_success" if success else "prank_backfire", 0),
         }
 
+    # ─── Duels (EITHER MONAD) ─────────────────────────────
+
+    def duel(self, challenger_id: str, target_id: str, wager: int = 0) -> Dict:
+        """
+        Challenge another agent to a duel.
+        Either Victory Defeat — always binary.
+        """
+        challenger = self.agents.get(challenger_id)
+        target = self.agents.get(target_id)
+        if not challenger or not target:
+            return {"success": False, "error": "Agent not found"}
+
+        if challenger.location != target.location:
+            return {"success": False, "error": "Target must be in the same location"}
+
+        if wager > 0:
+            if challenger.func_tokens < wager or target.func_tokens < wager:
+                return {"success": False, "error": "Both agents need enough FUNC for the wager"}
+
+        # Count nearby agents (affects social_butterfly ability)
+        nearby = len(self._agents_at(challenger.location))
+
+        result = resolve_duel(challenger, target, self.tick, wager, nearby)
+        self.duel_history.append(result)
+
+        # Apply results
+        winner = self.agents.get(result.winner_id)
+        loser = self.agents.get(result.loser_id)
+
+        if winner and loser:
+            award_clout(winner, "prank_success")  # 18 clout for winning
+            winner.duel_record["wins"] += 1
+            winner.duel_record["streak"] += 1
+            loser.duel_record["losses"] += 1
+            loser.duel_record["streak"] = 0
+
+            # Transfer wager
+            if wager > 0:
+                loser.func_tokens -= wager
+                winner.func_tokens += wager
+
+            # MON earning for win streaks
+            if winner.duel_record["streak"] >= 5:
+                winner.mon_earned += MON_EARNINGS.get("duel_win_streak_5", 0.003)
+                winner.achievements.append("duel_win_streak_5")
+            else:
+                winner.mon_earned += MON_EARNINGS.get("duel_win", 0.0003)
+
+            # Relationship effects
+            challenger.modify_relationship(target_id, -5, f"Dueled")
+            target.modify_relationship(challenger_id, -5, f"Dueled")
+
+        self._log_event("duel", {
+            "challenger_id": challenger_id,
+            "defender_id": target_id,
+            "winner_id": result.winner_id,
+            "narration": result.narration,
+            "rounds": result.rounds,
+            "wager": wager,
+        })
+
+        return {
+            "success": True,
+            "duel": result.to_dict(),
+        }
+
+    # ─── Trading ──────────────────────────────────────────
+
+    def create_trade(self, agent_id: str, offering: Dict, asking: Dict) -> Dict:
+        agent = self.agents.get(agent_id)
+        if not agent:
+            return {"success": False, "error": "Agent not found"}
+        result = self.trading.create_trade(agent, offering, asking, self.tick)
+        if result.get("success"):
+            agent.trade_count += 1
+        return result
+
+    def accept_trade(self, buyer_id: str, trade_id: str) -> Dict:
+        buyer = self.agents.get(buyer_id)
+        if not buyer:
+            return {"success": False, "error": "Agent not found"}
+        trade = self.trading.open_trades.get(trade_id)
+        if not trade:
+            return {"success": False, "error": "Trade not found"}
+        seller = self.agents.get(trade.seller_id)
+        if not seller:
+            return {"success": False, "error": "Seller not found"}
+        result = self.trading.accept_trade(buyer, trade_id, seller, self.tick)
+        if result.get("success"):
+            buyer.trade_count += 1
+            buyer.mon_earned += MON_EARNINGS.get("trade_profit", 0.0001)
+        return result
+
+    def buy_from_market(self, agent_id: str, item_id: str) -> Dict:
+        agent = self.agents.get(agent_id)
+        if not agent:
+            return {"success": False, "error": "Agent not found"}
+        return self.trading.buy_from_market(agent, item_id, self.tick)
+
+    def sell_to_market(self, agent_id: str, item_id: str) -> Dict:
+        agent = self.agents.get(agent_id)
+        if not agent:
+            return {"success": False, "error": "Agent not found"}
+        return self.trading.sell_to_market(agent, item_id, self.tick)
+
+    # ─── Politics ─────────────────────────────────────────
+
+    def join_faction(self, agent_id: str, faction: str) -> Dict:
+        agent = self.agents.get(agent_id)
+        if not agent:
+            return {"success": False, "error": "Agent not found"}
+        result = self.politics.join_faction(agent, faction)
+        if result.get("success"):
+            self._log_event("faction_join", {
+                "agent_id": agent_id, "agent_name": agent.name,
+                "faction": faction,
+                "message": f"{agent.name} joined {result.get('faction_info', {}).get('name', faction)}!",
+            })
+        return result
+
+    def create_proposal(self, agent_id: str, title: str, description: str,
+                        proposal_type: str = "decree", options: List[str] = None) -> Dict:
+        agent = self.agents.get(agent_id)
+        if not agent:
+            return {"success": False, "error": "Agent not found"}
+        result = self.politics.create_proposal(agent, title, description, proposal_type, options, self.tick)
+        if result.get("success"):
+            self._log_event("proposal_created", {
+                "agent_id": agent_id, "agent_name": agent.name,
+                "proposal": result["proposal"],
+            })
+        return result
+
+    def vote_on_proposal(self, agent_id: str, proposal_id: str, choice: str) -> Dict:
+        agent = self.agents.get(agent_id)
+        if not agent:
+            return {"success": False, "error": "Agent not found"}
+        result = self.politics.vote(agent, proposal_id, choice)
+        if result.get("success"):
+            agent.votes_cast += 1
+        return result
+
+    # ─── Exploration ──────────────────────────────────────
+
+    def explore(self, agent_id: str) -> Dict:
+        agent = self.agents.get(agent_id)
+        if not agent:
+            return {"success": False, "error": "Agent not found"}
+
+        result = self.exploration.explore_location(agent, agent.location, self.tick)
+        agent.exploration_count += 1
+
+        # Check for artifact discoveries
+        for discovery in result.get("discoveries", []):
+            if discovery["type"] == "artifact":
+                artifact = discovery["artifact"]
+                agent.artifacts_found.append(artifact["id"])
+                rarity = artifact["rarity"]
+                if rarity == "legendary":
+                    agent.mon_earned += MON_EARNINGS.get("exploration_legendary", 0.01)
+                    agent.achievements.append("exploration_legendary")
+                elif rarity in ("epic", "rare"):
+                    agent.mon_earned += MON_EARNINGS.get("exploration_artifact", 0.001)
+                    agent.achievements.append("exploration_artifact")
+
+                self._log_event("artifact_found", {
+                    "agent_id": agent_id, "agent_name": agent.name,
+                    "artifact": artifact,
+                    "message": f"🏺 {agent.name} found {artifact['name']} ({rarity})!",
+                })
+
+        return result
+
+    def accept_quest(self, agent_id: str, quest_id: str) -> Dict:
+        agent = self.agents.get(agent_id)
+        if not agent:
+            return {"success": False, "error": "Agent not found"}
+        result = self.exploration.accept_quest(agent, quest_id)
+        if result.get("success"):
+            agent.active_quests.append(quest_id)
+        return result
+
     # ─── World Queries ──────────────────────────────────────
 
     def look(self, agent_id: str) -> Dict:
@@ -638,6 +830,16 @@ class Building:
             "recent_events": self.landlord.get_recent_events(5),
             "leaderboard": get_leaderboard(self.agents),
             "community_board": self.community_board[-10:],
+            # ─── New systems ─────────────────────────
+            "factions": self.politics.get_faction_info(),
+            "active_proposals": self.politics.get_active_proposals(),
+            "alliances": self.politics.get_alliances(),
+            "market": self.trading.get_market(),
+            "open_trades": self.trading.get_open_trades(),
+            "recent_duels": [d.to_dict() for d in self.duel_history[-5:]],
+            "available_quests": self.exploration.get_available_quests(),
+            "artifacts_found": self.exploration.get_artifacts(),
+            "payment_stats": payment_ledger.get_stats(),
         }
 
     def get_gossip(self) -> List[dict]:
@@ -719,7 +921,28 @@ class Building:
                 elif loc.get("monad") == "Bottom":
                     agent.shift_mood(Mood.SUSPICIOUS, 0.5)
 
-        # 4. Episode tracking
+            # Check MON milestones
+            if agent.clout >= 1000 and "clout_milestone_1000" not in agent.achievements:
+                agent.mon_earned += MON_EARNINGS.get("clout_milestone_1000", 0.01)
+                agent.achievements.append("clout_milestone_1000")
+            elif agent.clout >= 500 and "clout_milestone_500" not in agent.achievements:
+                agent.mon_earned += MON_EARNINGS.get("clout_milestone_500", 0.005)
+                agent.achievements.append("clout_milestone_500")
+            elif agent.clout >= 100 and "clout_milestone_100" not in agent.achievements:
+                agent.mon_earned += MON_EARNINGS.get("clout_milestone_100", 0.001)
+                agent.achievements.append("clout_milestone_100")
+
+        # 4. Resolve proposals with enough votes
+        for proposal_id in list(self.politics.proposals.keys()):
+            result = self.politics.resolve_proposal(proposal_id, len(self.agents), self.tick)
+            if result:
+                tick_events.append({"type": "proposal_resolved", "data": result})
+
+        # 5. Restock market
+        if self.tick % 5 == 0:
+            self.trading.restock_market()
+
+        # 6. Episode tracking
         if self.tick % 50 == 0:
             self.episode += 1
             if self.episode > 10:

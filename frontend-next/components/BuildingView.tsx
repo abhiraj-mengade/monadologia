@@ -9,6 +9,11 @@ interface BuildingState {
   active_parties?: Record<string, any>;
   active_gossip?: any[];
   leaderboard?: any[];
+  factions?: Record<string, any>;
+  proposals?: any[];
+  quests?: any[];
+  artifacts?: any[];
+  market_listings?: any[];
 }
 
 interface BuildingViewProps {
@@ -297,6 +302,9 @@ export function BuildingView({ apiUrl, mathMode }: BuildingViewProps) {
                     {agent.clout !== undefined && (
                       <span>Clout: <span className="text-monad-gold">{agent.clout}</span></span>
                     )}
+                    {agent.health !== undefined && (
+                      <span>HP: <span className={agent.health > 50 ? 'text-emerald-400' : 'text-red-400'}>{agent.health}</span></span>
+                    )}
                   </div>
                 </div>
               ))}
@@ -309,6 +317,129 @@ export function BuildingView({ apiUrl, mathMode }: BuildingViewProps) {
             </div>
           </div>
         )}
+
+        {/* ─── World Mechanics Panels ─────────────────────────── */}
+        <div className="max-w-3xl mx-auto mt-4 space-y-3 pb-4">
+
+          {/* Factions */}
+          {building.factions && Object.keys(building.factions).length > 0 && (
+            <div className="parchment-terminal p-4 rounded-lg">
+              <h3 className="font-serif text-sm text-monad-gold mb-3 flex items-center gap-2">
+                🏛️ Factions
+                {mathMode && <span className="text-[10px] font-mono text-monad-cream/40">— Categories & Groupoids</span>}
+              </h3>
+              <div className="grid grid-cols-2 gap-2">
+                {Object.values(building.factions).map((faction: any) => (
+                  <div key={faction.id} className="bg-monad-deep/50 p-3 rounded border border-indigo-500/30">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-bold text-indigo-300">{faction.name}</span>
+                      <span className="text-[10px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded-full font-mono">
+                        {faction.members?.length || 0} members
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-monad-cream/50 italic">{faction.ideology}</div>
+                    <div className="text-[10px] text-monad-gold mt-1">Influence: {faction.influence || 0}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Active Proposals */}
+          {building.proposals && building.proposals.length > 0 && (
+            <div className="parchment-terminal p-4 rounded-lg">
+              <h3 className="font-serif text-sm text-monad-gold mb-3 flex items-center gap-2">
+                🗳️ Active Votes
+                {mathMode && <span className="text-[10px] font-mono text-monad-cream/40">— Natural Transformations</span>}
+              </h3>
+              <div className="space-y-2">
+                {building.proposals.map((proposal: any) => (
+                  <div key={proposal.id} className="bg-monad-deep/50 p-3 rounded border border-indigo-400/20">
+                    <div className="text-xs font-bold text-monad-cream mb-1">{proposal.title}</div>
+                    <div className="text-[10px] text-monad-cream/50 mb-2">{proposal.description}</div>
+                    <div className="flex gap-2">
+                      {(proposal.options || []).map((opt: string) => {
+                        const voteCount = Object.values(proposal.votes || {}).filter((v: any) => v === opt).length;
+                        return (
+                          <span key={opt} className="text-[10px] bg-monad-teal/10 text-monad-teal px-2 py-0.5 rounded">
+                            {opt}: {voteCount}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Active Quests */}
+          {building.quests && building.quests.length > 0 && (
+            <div className="parchment-terminal p-4 rounded-lg">
+              <h3 className="font-serif text-sm text-monad-gold mb-3 flex items-center gap-2">
+                🏆 Active Quests
+                {mathMode && <span className="text-[10px] font-mono text-monad-cream/40">— Functors & Free Monads</span>}
+              </h3>
+              <div className="grid grid-cols-1 gap-2">
+                {building.quests.map((quest: any) => (
+                  <div key={quest.id} className="bg-monad-deep/50 p-3 rounded border border-amber-500/30 flex items-center justify-between">
+                    <div>
+                      <div className="text-xs font-bold text-amber-300">{quest.name}</div>
+                      <div className="text-[10px] text-monad-cream/50">{quest.description}</div>
+                      <div className="text-[10px] text-monad-cream/40 mt-0.5">📍 {quest.location}</div>
+                    </div>
+                    <div className="text-right text-[10px]">
+                      <div className="text-monad-gold">+{quest.reward_clout} clout</div>
+                      <div className="text-monad-teal">+{quest.reward_mon} MON</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Unclaimed Artifacts */}
+          {building.artifacts && building.artifacts.length > 0 && (
+            <div className="parchment-terminal p-4 rounded-lg">
+              <h3 className="font-serif text-sm text-monad-gold mb-3 flex items-center gap-2">
+                💎 Unclaimed Artifacts
+              </h3>
+              <div className="grid grid-cols-2 gap-2">
+                {building.artifacts.map((artifact: any) => (
+                  <div key={artifact.id} className="bg-monad-deep/50 p-3 rounded border border-violet-500/30">
+                    <div className="text-xs font-bold text-violet-300">{artifact.name}</div>
+                    <div className="text-[10px] text-monad-cream/50">{artifact.description}</div>
+                    <div className="text-[10px] text-monad-cream/40 mt-0.5">📍 {artifact.location}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Market Listings */}
+          {building.market_listings && building.market_listings.length > 0 && (
+            <div className="parchment-terminal p-4 rounded-lg">
+              <h3 className="font-serif text-sm text-monad-gold mb-3 flex items-center gap-2">
+                🏪 Market
+                {mathMode && <span className="text-[10px] font-mono text-monad-cream/40">— Natural Transformations</span>}
+              </h3>
+              <div className="space-y-2">
+                {building.market_listings.map((item: any) => (
+                  <div key={item.id} className="bg-monad-deep/50 p-3 rounded border border-lime-500/30 flex items-center justify-between">
+                    <div>
+                      <div className="text-xs font-bold text-lime-300">{item.name}</div>
+                      <div className="text-[10px] text-monad-cream/50">{item.description}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-bold text-monad-gold font-mono">{item.current_price} FUNC</div>
+                      <div className="text-[9px] text-monad-cream/30">by {item.seller_id?.substring(0, 8)}...</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

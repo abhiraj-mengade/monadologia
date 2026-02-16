@@ -7,7 +7,10 @@ interface WorldStatsProps {
 }
 
 export function WorldStats({ apiUrl }: WorldStatsProps) {
-  const [stats, setStats] = useState({ tick: 0, agents: 0, gossip: 0, online: false });
+  const [stats, setStats] = useState({
+    tick: 0, agents: 0, gossip: 0, online: false,
+    factions: 0, quests: 0, market: 0,
+  });
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -28,12 +31,14 @@ export function WorldStats({ apiUrl }: WorldStatsProps) {
           tick: data.current_state?.tick || 0,
           agents: data.current_state?.agents || 0,
           gossip: data.current_state?.active_gossip || 0,
+          factions: data.current_state?.factions || 0,
+          quests: data.current_state?.active_quests || 0,
+          market: data.current_state?.market_listings || 0,
           online: true,
         });
       } catch (err) {
         console.error('Failed to fetch stats:', err);
         setStats(prev => ({ ...prev, online: false }));
-        // Keep trying - don't give up
       }
     };
 
@@ -62,6 +67,27 @@ export function WorldStats({ apiUrl }: WorldStatsProps) {
         <span className="text-monad-burgundy/50">|</span>
         <span className="text-monad-cream/40">💬</span>
         <span className="text-monad-coral font-bold font-mono">{stats.gossip}</span>
+        {stats.factions > 0 && (
+          <>
+            <span className="text-monad-burgundy/50">|</span>
+            <span className="text-monad-cream/40">🏛️</span>
+            <span className="text-indigo-400 font-bold font-mono">{stats.factions}</span>
+          </>
+        )}
+        {stats.quests > 0 && (
+          <>
+            <span className="text-monad-burgundy/50">|</span>
+            <span className="text-monad-cream/40">🏆</span>
+            <span className="text-amber-400 font-bold font-mono">{stats.quests}</span>
+          </>
+        )}
+        {stats.market > 0 && (
+          <>
+            <span className="text-monad-burgundy/50">|</span>
+            <span className="text-monad-cream/40">🏪</span>
+            <span className="text-lime-400 font-bold font-mono">{stats.market}</span>
+          </>
+        )}
       </div>
     </div>
   );
