@@ -154,6 +154,7 @@ async def root():
             "stories": "GET /stories — Narrated story feed",
             "gossip": "GET /gossip — Active gossip chains",
             "economy": "GET /economy — Full economy overview (MON, FUNC, market, leaderboards)",
+            "claim": "GET /claim — View your earned MON and claim instructions (requires auth)",
             "market": "GET /market — Item market with dynamic pricing",
             "factions": "GET /factions — Political factions and alliances",
             "proposals": "GET /proposals — Active building proposals",

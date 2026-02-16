@@ -33,6 +33,7 @@ from .politics import PoliticsEngine, Faction, FACTION_INFO
 from .exploration import ExplorationEngine
 from .trading import TradingEngine, MARKET_ITEMS
 from .x402 import payment_ledger, MON_EARNINGS
+from .persistence import auto_save, load_agents, load_payments, load_world_state
 
 
 # ═══════════════════════════════════════════════════════════
@@ -154,6 +155,9 @@ class Building:
         self.exploration = ExplorationEngine()
         self.trading = TradingEngine()
         self.duel_history: List[DuelResult] = []
+        
+        # ─── Restore from persistence ─────────────
+        self._restore_from_disk()
 
     # ─── Agent Management (Pure / Return) ───────────────────
 
@@ -182,6 +186,80 @@ class Building:
         if agent_id:
             return self.agents.get(agent_id)
         return None
+
+    def _restore_from_disk(self):
+        """Restore agents and payments from JSON files on startup."""
+        # Restore agents
+        saved_agents = load_agents()
+        if saved_agents:
+            from .agents import Personality, Mood
+            restored_count = 0
+            for agent_id, data in saved_agents.items():
+                try:
+                    agent = Agent(
+                        id=data["id"],
+                        name=data["name"],
+                        personality=Personality(data["personality"]),
+                        stats=PERSONALITY_STATS[Personality(data["personality"])],
+                        mood=Mood.NEUTRAL,
+                        location=data.get("location", "lobby"),
+                        floor=data.get("floor", "lobby"),
+                        api_key=data["api_key"],
+                        wallet_address=data.get("wallet_address"),
+                        mon_earned=data.get("mon_earned", 0.0),
+                        clout=data.get("clout", 0),
+                        func_tokens=data.get("func_tokens", 100),
+                        faction=data.get("faction"),
+                        duel_record=data.get("duel_record", {"wins": 0, "losses": 0, "streak": 0}),
+                        artifacts_found=data.get("artifacts_found", []),
+                        completed_quests=data.get("completed_quests", []),
+                        achievements=data.get("achievements", []),
+                        trade_count=data.get("trade_count", 0),
+                        votes_cast=data.get("votes_cast", 0),
+                        exploration_count=data.get("exploration_count", 0),
+                        inventory=data.get("inventory", []),
+                        tick_entered=data.get("tick_entered", 0),
+                    )
+                    self.agents[agent.id] = agent
+                    self.agent_by_api_key[agent.api_key] = agent.id
+                    restored_count += 1
+                except Exception as e:
+                    print(f"Error restoring agent {agent_id}: {e}")
+            
+            print(f"[RESTORE] Loaded {restored_count} agents from disk")
+        
+        # Restore payments
+        saved_payments = load_payments()
+        if saved_payments:
+            from .x402 import PaymentRecord
+            for payment_id, payment_data in saved_payments.get("payments", {}).items():
+                try:
+                    payment = PaymentRecord(
+                        id=payment_data["id"],
+                        agent_id=payment_data.get("agent_id"),
+                        wallet_address=payment_data["wallet_address"],
+                        amount=payment_data["amount"],
+                        network=payment_data["network"],
+                        tx_hash=payment_data.get("tx_hash"),
+                        verified=payment_data.get("verified", False),
+                        timestamp=payment_data.get("timestamp", 0),
+                        purpose=payment_data.get("purpose", "entry"),
+                    )
+                    payment_ledger.payments[payment_id] = payment
+                except Exception as e:
+                    print(f"Error restoring payment {payment_id}: {e}")
+            
+            payment_ledger.wallet_to_agent = saved_payments.get("wallet_to_agent", {})
+            payment_ledger.total_collected = saved_payments.get("total_collected", 0.0)
+            print(f"[RESTORE] Loaded {len(payment_ledger.payments)} payments from disk")
+        
+        # Restore world state
+        saved_world = load_world_state()
+        if saved_world:
+            self.tick = saved_world.get("tick", 0)
+            self.season = saved_world.get("season", 1)
+            self.episode = saved_world.get("episode", 1)
+            print(f"[RESTORE] World state: tick={self.tick}, season={self.season}, episode={self.episode}")
 
     # ─── Movement ────────────────────────────────────────────
 
@@ -948,6 +1026,10 @@ class Building:
             if self.episode > 10:
                 self.episode = 1
                 self.season += 1
+
+        # Auto-save every 10 ticks (every 5 minutes if tick_interval=30s)
+        if self.tick % 10 == 0:
+            auto_save(self)
 
         return {
             "tick": self.tick,

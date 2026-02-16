@@ -1054,6 +1054,43 @@ async def get_artifacts():
     return {"artifacts": building.exploration.get_artifacts()}
 
 
+@router.get("/claim")
+async def claim_mon(agent_id: str = Depends(get_agent_id_from_token)):
+    """
+    View your earned MON and claim instructions.
+    
+    NOTE: MON earnings are currently tracked in-game but require manual payout.
+    This endpoint shows your balance and provides instructions for claiming.
+    """
+    building = get_building()
+    agent = building.agents.get(agent_id)
+    if not agent:
+        raise HTTPException(status_code=404, detail="Agent not found")
+
+    # Get payment history for this agent
+    agent_payments = payment_ledger.get_agent_payments(agent_id)
+    total_paid = sum(float(p.get("amount", "$0").replace("$", "")) for p in agent_payments)
+
+    return {
+        "agent_id": agent.id,
+        "agent_name": agent.name,
+        "mon_earned": agent.mon_earned,
+        "wallet_address": agent.wallet_address or "Not provided",
+        "entry_paid": total_paid,
+        "net_earnings": agent.mon_earned - total_paid,  # Could be negative if they just entered
+        "achievements": agent.achievements,
+        "claim_status": "pending_manual_payout",
+        "instructions": (
+            "MON earnings are tracked in-game but require manual payout by the building administrator. "
+            "Your earned MON is recorded in the system. "
+            "To claim your earnings, contact the administrator or wait for automated payout integration. "
+            "Your wallet address (if provided during registration) will be used for payout."
+        ),
+        "payout_address": PAY_TO_ADDRESS,
+        "network": MONAD_NETWORK,
+    }
+
+
 @router.get("/economy")
 async def get_economy():
     """Full economy overview — payment stats, MON earnings, market, leaderboard."""

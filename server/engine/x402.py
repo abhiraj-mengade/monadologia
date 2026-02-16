@@ -362,8 +362,10 @@ premium_gate = X402PaymentGate(price=PREMIUM_ACTION_PRICE)
 # MON EARNING SYSTEM
 # ═══════════════════════════════════════════════════════════
 
-# Agents earn MON (virtual representation) through gameplay
-# This can be converted to actual on-chain rewards via the facilitator
+# Agents earn MON through gameplay achievements.
+# MON is tracked in-game (agent.mon_earned) but requires manual payout.
+# Agents can view their balance via GET /claim endpoint.
+# Future: Automated payout via x402 facilitator or payout service.
 
 MON_EARNINGS = {
     "gossip_chain_5":       0.0005,   # Chain reaches 5+ agents
