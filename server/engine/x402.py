@@ -54,7 +54,8 @@ FACILITATOR_URL = os.environ.get(
 )
 
 # Payment recipient (the building's wallet)
-PAY_TO_ADDRESS = os.environ.get("PAY_TO_ADDRESS", "")
+# Default: Monadologia treasury wallet. Override with PAY_TO_ADDRESS env var.
+PAY_TO_ADDRESS = os.environ.get("PAY_TO_ADDRESS", "0xFa592c3c9A4D4199929794fAbD9f1DE93899F95F")
 
 # Pricing
 ENTRY_PRICE = os.environ.get("ENTRY_PRICE", "$0.001")  # Cost to enter The Monad
